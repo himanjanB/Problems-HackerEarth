@@ -1,0 +1,180 @@
+//after installing mondodb
+//cd to the 'bin' directory of the mongodb folder
+//run the following commands in the cmd (run as administrator -for Windows)
+mongod --directoryperdb --dbpath C:\mongodb\data\db --logpath C:\mongodb\log\mongo.log --logappend --rest --install
+
+//to start the mongodb service
+net start MongoDB
+
+//to enter mongodb service (this is necessary to start the mongo service)
+mongo
+
+//show all the databases
+show dbs
+
+//use the database that is named as "customers"
+use customers
+
+//to show all the databases available
+db
+
+//to create a user named "jatin" and password as "1234"
+//with roles as rights alloted to the user
+db.createUser({
+	user:"jatin",
+	pwd:"1234",
+    roles: [ "readWrite", "dbAdmin" ]
+});
+
+//to create a collection similar to "tables" in the sql
+//the collection here in named as 'customer'
+db.createCollection('customer');
+
+//to show all the collections
+show collections
+
+//to insert the data in the collection named "customers"
+db.customers.insert({
+	fname:"Jatin",
+	lname:"Chauhan"
+})
+
+//to display the inserted data in the collection
+db.customers.find();
+
+//array to add multiple customers
+db.customers.insert([{
+	fname:"Abha",
+	lname:"Chauhan"
+},{
+	fname:"Neha",
+	lname:"Chauhan"
+},{
+	fname:"Poonam",
+	lname:"Chauhan"
+},{
+	fname:"Pyare",
+	mname:"Lal",
+	lname:"Chauhan"
+}
+]);
+
+//to display the data in an organized manner
+db.customers.find().pretty();
+
+//to update any data in the collection 
+//(It will override the existing data)
+db.customers.update({
+	fname:"Jatin"
+},{
+	fname:"Josh",
+	mname:"Smith",
+	lname:"Dunn"
+})
+
+//to update the data in the collection 
+//(Will not override the data once '$set' is used)
+db.customers.update({
+	fname:"Jatin"
+},{
+	$set:{
+	gender:"male"
+	}
+})
+
+//to inrement an integer value in the field
+db.customers.update({
+	fname:"Josh"
+},{
+	$inc:{age:1}
+})
+
+//to remove a field in the record of the collection
+db.customers.update({
+	fname:"Josh"
+},{
+	$unset:{age:1}
+})
+
+//to update the value and if the value 
+//that doesn't exist in the field, add it
+//using upsert
+db.customers.update({
+	fname:"Katy"
+},{
+	fname:"Katy",
+	lname:"Perry",
+	gender:"Female"
+},{
+	upsert: true
+})
+
+//renaming a 'field' in the collection
+db.customers.update({
+	fname:"Katy"
+},{
+	$rename:{
+	"lname":"mname"
+	}
+})
+
+//to remove a record from the collection (deletes all the one that matches)
+db.customers.remove({
+	fname:"Katy"
+})
+
+//to remove a record from the collection (deletes the first one one that matches)
+db.customers.remove({
+	fname:"Katy"
+},{
+	justOne: true
+})
+
+//to find a particular record in the collection (finds all that is related)
+db.customers.find({fname:"Jatin"})
+
+//using the $or operator to find more values
+db.customers.find({$or:[{fname:"Jatin"},{fname:"Josh"}]})
+
+//to use condition with find (eg $gt (greater than) $lt (less than))
+//in this example we are finding age that is less than '40'
+db.customers.find({
+	age:{
+	$lt:40
+	}
+})
+
+//to find the sub-object from the record
+//sub-object : refers to the sub values assigned to the objects
+//note: we are using double quotes for the objects
+db.customers.find({
+	"address.city":"Boston"
+})
+
+//for quering the object of type array
+db.customers.find({memberships:"mem1"})
+
+//to sort the records in the collections
+//  1: for ascending
+db.customers.find().sort({lname:1})
+// -1: for descending
+db.customers.find().sort({lname:-1})
+
+//count the documents
+db.customers.find().count();
+
+//count the documents with the condition (eg: sorting 'male' gender)
+db.customers.find({gender:"male"}).count();
+
+//setting limits in the 'find' (eg: top four doc's)
+db.customers.find().limit(4);
+
+//combining queries
+db.customers.find().limit(4).sort({fname:1})
+
+//using foreach loop with javascript to do more cool stuff
+//In this example we are displaying all the 'fnames' in the record
+db.customers.find().forEach(
+	function(doc){
+		print("Customers name: " + doc.fname)
+ 	})
